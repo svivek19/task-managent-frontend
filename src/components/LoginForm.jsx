@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import loginImg from "../assets/login-img.png";
 import RegisterForm from "./RegisterForm";
+import { useDispatch, useSelector } from "react-redux";
+import { clearError, loginUser } from "../redux/features/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [loginToggle, setLoginToggle] = useState(true);
@@ -9,14 +12,34 @@ const LoginForm = () => {
     password: "",
   });
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, isAuthenticated, error } = useSelector(
+    (state) => state.user
+  );
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+
+    return () => {
+      if (error) {
+        dispatch(clearError());
+      }
+    };
+  }, [isAuthenticated, navigate, dispatch, error]);
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
+    dispatch(loginUser(formData));
   };
 
   return (
@@ -68,7 +91,7 @@ const LoginForm = () => {
                 onClick={handleSubmit}
                 className="w-full bg-blue-900 text-white py-2 rounded-md hover:bg-blue-800 transition duration-200 cursor-pointer"
               >
-                Log In
+                {loading ? "please wait.." : "Log In"}
               </button>
             </form>
           ) : (
