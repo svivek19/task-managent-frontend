@@ -11,22 +11,22 @@ const Sidebar = () => {
 
   const adminSideItems = [
     {
-      path: "/dashboard",
+      path: "/admin/dashboard",
       icon: "fluent-color:calendar-data-bar-24",
       title: "Dashboard",
     },
     {
-      path: "/employee",
+      path: "/admin/employee",
       icon: "fluent-color:people-team-24",
       title: "Manage Tasks",
     },
     {
-      path: "/project",
+      path: "/admin/project",
       icon: "fluent-color:design-ideas-24",
       title: "Create Task",
     },
     {
-      path: "/team-members",
+      path: "/admin/team-members",
       icon: "fluent-color:people-community-24",
       title: "Team",
     },
@@ -40,7 +40,7 @@ const Sidebar = () => {
       cancelText: "No",
       onOk: () => {
         dispatch(logout());
-        toast.success("Session ended successfully.");
+        toast.info("Session ended successfully.");
       },
     });
   };
@@ -90,7 +90,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md flex justify-around items-center p-2 md:hidden z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md flex justify-around items-center p-2 md:hidden z-50 ">
         {adminSideItems.map((item, index) => (
           <NavLink
             key={index}

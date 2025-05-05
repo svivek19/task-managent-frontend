@@ -1,6 +1,6 @@
 import React from "react";
 
-const Dashboard = () => {
+const AdminDashboard = () => {
   const today = new Date();
 
   function getFormattedDate(date) {
@@ -60,4 +60,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;

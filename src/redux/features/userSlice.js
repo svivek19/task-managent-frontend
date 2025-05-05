@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Axios from "../../services/Axios";
 import { toast } from "sonner";
-import { jwtDecode } from "jwt-decode";
 
 export const registerUser = createAsyncThunk(
   "user/registerUser",
@@ -75,7 +74,7 @@ const userSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       localStorage.removeItem("token");
-      Axios.defaults.headers.common["Authorization"] = "";
+      delete Axios.defaults.headers.common["Authorization"];
     },
     clearError: (state) => {
       state.error = null;

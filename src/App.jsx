@@ -8,9 +8,10 @@ import {
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
 import { fetchCurrentUser } from "./redux/features/userSlice";
 import Sidebar from "./components/Sidebar";
+import AdminDashboard from "./pages/AdminDashboard";
+import Employee from "./pages/Employee";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector((state) => state.user);
@@ -44,15 +45,23 @@ const AppLayout = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden ">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto bg-gray-100 p-4">
+        <main className="flex-1 overflow-y-auto bg-gray-100 p-4 pb-20 md:pb-0">
           <Routes>
             <Route
-              path="/dashboard"
+              path="/admin/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/team-members"
+              element={
+                <ProtectedRoute>
+                  <Employee />
                 </ProtectedRoute>
               }
             />

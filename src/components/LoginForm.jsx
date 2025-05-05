@@ -14,21 +14,19 @@ const LoginForm = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, isAuthenticated, error } = useSelector(
+  const { loading, isAuthenticated, error, user } = useSelector(
     (state) => state.user
   );
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/dashboard");
+    if (isAuthenticated && user?.role) {
+      navigate(`/${user.role}/dashboard`);
     }
 
-    return () => {
-      if (error) {
-        dispatch(clearError());
-      }
-    };
-  }, [isAuthenticated, navigate, dispatch, error]);
+    if (error) {
+      dispatch(clearError());
+    }
+  }, [isAuthenticated, user, error, dispatch, navigate]);
 
   const handleChange = (e) => {
     setFormData({

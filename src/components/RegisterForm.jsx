@@ -8,7 +8,7 @@ const RegisterForm = () => {
     fullName: "",
     age: "",
     gender: "",
-    role: "",
+    role: "admin",
     email: "",
     password: "",
   });
@@ -25,7 +25,7 @@ const RegisterForm = () => {
       fullName: "",
       age: "",
       gender: "",
-      role: "",
+      role: "admin",
       email: "",
       password: "",
     });
@@ -79,23 +79,6 @@ const RegisterForm = () => {
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="other">Other</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Role
-          </label>
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md outline-none"
-            required
-          >
-            <option value="">Select</option>
-            <option value="admin">Admin</option>
-            <option value="employee">Employee</option>
           </select>
         </div>
 
