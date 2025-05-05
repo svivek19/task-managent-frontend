@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { registerUser } from "../redux/features/userSlice";
 
 const RegisterForm = () => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     fullName: "",
     age: "",
@@ -17,7 +20,15 @@ const RegisterForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
+    dispatch(registerUser(formData));
+    setFormData({
+      fullName: "",
+      age: "",
+      gender: "",
+      role: "",
+      email: "",
+      password: "",
+    });
   };
 
   return (

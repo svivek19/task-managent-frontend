@@ -10,7 +10,6 @@ import { useDispatch, useSelector } from "react-redux";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import { fetchCurrentUser } from "./redux/features/userSlice";
-import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 
 const ProtectedRoute = ({ children }) => {
@@ -45,8 +44,6 @@ const AppLayout = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <Navbar />
-
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-1 overflow-y-auto bg-gray-50 p-4">
