@@ -18,8 +18,6 @@ const Employee = () => {
   const dispatch = useDispatch();
   const { employees, loading, error } = useSelector((state) => state.employee);
 
-  console.log(employees, loading, error);
-
   const [formData, setFormData] = useState(initialState);
 
   const handleChange = (e) => {

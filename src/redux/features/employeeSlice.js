@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Axios from "../../services/Axios";
+import { toast } from "sonner";
 
 export const getAllEmployees = createAsyncThunk(
   "employee/getAll",
@@ -17,6 +18,27 @@ export const getAllEmployees = createAsyncThunk(
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to fetch employees";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const deleteEmployee = createAsyncThunk(
+  "employee/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return rejectWithValue("No authentication token found");
+      }
+
+      Axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      await Axios.delete(`/user/delete/${id}`);
+      toast.success("Employee deleted successfully");
+      return id;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to delete employee";
       return rejectWithValue(errorMessage);
     }
   }
@@ -42,6 +64,21 @@ const employeeSlice = createSlice({
         state.error = null;
       })
       .addCase(getAllEmployees.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteEmployee.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteEmployee.fulfilled, (state, action) => {
+        state.loading = false;
+        state.employees = state.employees.filter(
+          (emp) => emp._id !== action.payload
+        );
+        state.error = null;
+      })
+      .addCase(deleteEmployee.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

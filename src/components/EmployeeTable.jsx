@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Icon } from "@iconify/react";
+import { deleteEmployee } from "../redux/features/employeeSlice";
+import { useDispatch } from "react-redux";
 
 const EmployeeTable = ({ employees }) => {
+  const dispatch = useDispatch();
   const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -18,6 +21,10 @@ const EmployeeTable = ({ employees }) => {
 
   const handleNext = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const handleDelete = async (id) => {
+    dispatch(deleteEmployee(id));
   };
 
   return (
@@ -55,7 +62,10 @@ const EmployeeTable = ({ employees }) => {
                     {emp.gender}
                   </td>
                   <td className="px-6 py-3 border-t capitalize font-medium flex justify-center">
-                    <button className="inline-flex items-center gap-1 cursor-pointer bg-red-50 text-red-600 border border-red-300 px-3 py-1.5 rounded-md hover:bg-red-100 hover:text-red-700 transition-colors duration-200">
+                    <button
+                      onClick={() => handleDelete(emp._id)}
+                      className="inline-flex items-center gap-1 cursor-pointer bg-red-50 text-red-600 border border-red-300 px-3 py-1.5 rounded-md hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
+                    >
                       <Icon
                         icon="solar:trash-bin-minimalistic-broken"
                         width="20"
