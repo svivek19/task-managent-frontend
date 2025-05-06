@@ -1,7 +1,11 @@
-import { useState } from "react";
-import { Icon } from "@iconify/react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllEmployees } from "../redux/features/employeeSlice";
 
 export default function CreateTask() {
+  const dispatch = useDispatch();
+  const { employees } = useSelector((state) => state.employee);
+
   const [task, setTask] = useState({
     title: "",
     description: "",
@@ -20,41 +24,42 @@ export default function CreateTask() {
 
   const handleAddAssignee = () => {
     if (assignInput.trim()) {
-      const colors = [
-        "bg-blue-500",
-        "bg-green-500",
-        "bg-yellow-500",
-        "bg-purple-500",
-        "bg-pink-500",
-        "bg-indigo-500",
-        "bg-red-500",
-      ];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const emailExists = task.assignTo.some(
+        (person) => person.email === assignInput.trim()
+      );
 
-      const newAssignee = {
-        email: assignInput.trim(),
-        initials: assignInput.trim().substring(0, 2).toUpperCase(),
-        color: randomColor,
-      };
+      if (!emailExists) {
+        const colors = [
+          "bg-blue-500",
+          "bg-green-500",
+          "bg-yellow-500",
+          "bg-purple-500",
+          "bg-pink-500",
+          "bg-indigo-500",
+          "bg-red-500",
+        ];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
-      setTask({ ...task, assignTo: [...task.assignTo, newAssignee] });
+        const newAssignee = {
+          email: assignInput.trim(),
+          initials: assignInput.trim().substring(0, 2).toUpperCase(),
+          color: randomColor,
+        };
+
+        setTask({ ...task, assignTo: [...task.assignTo, newAssignee] });
+      }
       setAssignInput("");
     }
   };
 
-  const handleKeyPressAssignee = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddAssignee();
-    }
-  };
-
   const removeAssignee = (emailToRemove) => {
-    setTask({
-      ...task,
-      assignTo: task.assignTo.filter(
-        (person) => person.email !== emailToRemove
-      ),
+    setTask((prevTask) => {
+      return {
+        ...prevTask,
+        assignTo: prevTask.assignTo.filter(
+          (person) => person.email !== emailToRemove
+        ),
+      };
     });
   };
 
@@ -94,8 +99,12 @@ export default function CreateTask() {
     console.log("Submitted task:", task);
   };
 
+  useEffect(() => {
+    dispatch(getAllEmployees());
+  }, [dispatch]);
+
   return (
-    <div className="p-6 bg-white rounded-xl shadow-lg max-w-6xl mx-auto">
+    <div className="p-4 bg-white rounded-xl shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">
         Create New Task
       </h2>
@@ -178,43 +187,24 @@ export default function CreateTask() {
 
         <div className="space-y-4">
           <div>
-            <label
-              htmlFor="assignTo"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Assign To
             </label>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              {task.assignTo.map((person, index) => (
-                <div
-                  key={index}
-                  className="flex items-center bg-gray-100 rounded-full pl-1 pr-2 py-1"
-                >
-                  <div
-                    className={`w-6 h-6 rounded-full ${person.color} flex items-center justify-center text-white text-xs font-medium mr-1`}
-                  >
-                    {person.initials}
-                  </div>
-                  <span className="text-sm mr-1">{person.email}</span>
-                  <button
-                    onClick={() => removeAssignee(person.email)}
-                    className="text-gray-500 hover:text-red-500 cursor-pointer"
-                  >
-                    <Icon icon="mdi:close" className="w-5 h-5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div className="flex">
-              <input
-                type="text"
+            <div className="flex mb-2">
+              <select
                 id="assignTo"
                 value={assignInput}
                 onChange={(e) => setAssignInput(e.target.value)}
-                onKeyUp={handleKeyPressAssignee}
-                placeholder="Enter email and press Enter"
                 className="w-full border border-gray-300 px-4 py-2 rounded-l-md outline-none"
-              />
+              >
+                <option value="">Select employee</option>
+                {Array.isArray(employees) &&
+                  employees.map((val, i) => (
+                    <option key={i} value={val.email}>
+                      {val.fullName} ({val.email})
+                    </option>
+                  ))}
+              </select>
               <button
                 type="button"
                 onClick={handleAddAssignee}
@@ -222,6 +212,35 @@ export default function CreateTask() {
               >
                 Add
               </button>
+            </div>
+
+            <div className="mt-2 border rounded-md border-gray-300 h-24 overflow-y-auto p-2">
+              <div className="flex flex-wrap gap-2">
+                {task.assignTo.map((person, idx) => (
+                  <div
+                    key={idx}
+                    className={`${person.color} text-white px-3 py-1 rounded-full flex items-center text-sm shadow-sm`}
+                  >
+                    <div className="w-5 h-5 rounded-full bg-white text-gray-800 flex items-center justify-center mr-2 font-bold text-xs">
+                      {person.initials}
+                    </div>
+                    <span className="mr-1">{person.email.split("@")[0]}</span>
+                    <button
+                      onClick={() => removeAssignee(person.email)}
+                      className="ml-1 w-4 h-4 rounded-full bg-white/30 flex items-center justify-center hover:bg-white/50 text-white"
+                      title="Remove"
+                    >
+                      <span className="text-xs">✕</span>
+                    </button>
+                  </div>
+                ))}
+
+                {task.assignTo.length === 0 && (
+                  <div className="text-gray-500 text-sm italic py-4 text-center w-full">
+                    No assignees added yet
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -271,7 +290,7 @@ export default function CreateTask() {
                       onClick={() => removeTodoItem(index)}
                       className="text-gray-500 cursor-pointer hover:text-red-500 ml-2"
                     >
-                      <Icon icon="mdi:trash-can-outline" className="w-5 h-5" />
+                      <span>🗑️</span>
                     </button>
                   </div>
                 ))}
@@ -286,12 +305,12 @@ export default function CreateTask() {
           </div>
         </div>
 
-        <div className="md:col-span-2 mt-4">
+        <div className="md:col-span-2">
           <button
             onClick={handleSubmit}
             className="flex items-center gap-2 cursor-pointer w-fit bg-blue-100 text-blue-800 px-4 py-2 rounded-md hover:bg-blue-200 transition-colors font-medium"
           >
-            <Icon icon="tabler:clipboard-plus" className="w-5 h-5" />
+            <span>📋</span>
             Create Task
           </button>
         </div>
