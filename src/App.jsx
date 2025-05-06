@@ -12,6 +12,7 @@ import { fetchCurrentUser } from "./redux/features/userSlice";
 import Sidebar from "./components/Sidebar";
 import AdminDashboard from "./pages/AdminDashboard";
 import Employee from "./pages/Employee";
+import CreateTask from "./pages/CreateTask";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector((state) => state.user);
@@ -62,6 +63,14 @@ const AppLayout = () => {
               element={
                 <ProtectedRoute>
                   <Employee />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/create-task"
+              element={
+                <ProtectedRoute>
+                  <CreateTask />
                 </ProtectedRoute>
               }
             />

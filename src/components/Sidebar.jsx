@@ -21,7 +21,7 @@ const Sidebar = () => {
       title: "Manage Tasks",
     },
     {
-      path: "/admin/project",
+      path: "/admin/create-task",
       icon: "fluent-color:design-ideas-24",
       title: "Create Task",
     },
