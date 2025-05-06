@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../redux/features/userSlice";
+import { getAllEmployees } from "../redux/features/employeeSlice";
+import EmployeeTable from "../components/EmployeeTable";
 
 const initialState = {
   fullName: "",
@@ -14,6 +16,10 @@ const initialState = {
 
 const Employee = () => {
   const dispatch = useDispatch();
+  const { employees, loading, error } = useSelector((state) => state.employee);
+
+  console.log(employees, loading, error);
+
   const [formData, setFormData] = useState(initialState);
 
   const handleChange = (e) => {
@@ -26,6 +32,10 @@ const Employee = () => {
     dispatch(registerUser(formData));
     setFormData(initialState);
   };
+
+  useEffect(() => {
+    dispatch(getAllEmployees());
+  }, [dispatch]);
 
   return (
     <div>
@@ -112,6 +122,8 @@ const Employee = () => {
           </div>
         </form>
       </div>
+
+      <EmployeeTable employees={employees} />
     </div>
   );
 };
