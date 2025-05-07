@@ -16,7 +16,7 @@ const Sidebar = () => {
       title: "Dashboard",
     },
     {
-      path: "/admin/employee",
+      path: "/admin/manage-task",
       icon: "fluent-color:people-team-24",
       title: "Manage Tasks",
     },

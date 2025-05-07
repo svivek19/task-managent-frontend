@@ -13,6 +13,7 @@ import Sidebar from "./components/Sidebar";
 import AdminDashboard from "./pages/AdminDashboard";
 import Employee from "./pages/Employee";
 import CreateTask from "./pages/CreateTask";
+import ManageTask from "./pages/ManageTask";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector((state) => state.user);
@@ -71,6 +72,14 @@ const AppLayout = () => {
               element={
                 <ProtectedRoute>
                   <CreateTask />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/manage-task"
+              element={
+                <ProtectedRoute>
+                  <ManageTask />
                 </ProtectedRoute>
               }
             />

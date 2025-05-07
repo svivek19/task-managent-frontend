@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEmployees } from "../redux/features/employeeSlice";
+import { createTaskThunk } from "../redux/features/taskSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateTask() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { employees } = useSelector((state) => state.employee);
 
@@ -96,7 +99,8 @@ export default function CreateTask() {
   };
 
   const handleSubmit = () => {
-    console.log("Submitted task:", task);
+    dispatch(createTaskThunk(task));
+    navigate("/admin/manage-task");
   };
 
   useEffect(() => {
@@ -201,7 +205,7 @@ export default function CreateTask() {
                 {Array.isArray(employees) &&
                   employees.map((val, i) => (
                     <option key={i} value={val.email}>
-                      {val.fullName} ({val.email})
+                      {val.fullName}
                     </option>
                   ))}
               </select>
