@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllEmployees } from "../redux/features/employeeSlice";
 import { createTaskThunk } from "../redux/features/taskSlice";
 import { useNavigate } from "react-router-dom";
+import { Icon } from "@iconify/react";
 
 export default function CreateTask() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function CreateTask() {
     todoCheckList: [],
   });
 
-  const [assignInput, setAssignInput] = useState("");
+  const [assignInput, setAssignInput] = useState({ email: "", fullName: "" });
   const [todoInput, setTodoInput] = useState("");
 
   const handleChange = (e) => {
@@ -26,32 +27,39 @@ export default function CreateTask() {
   };
 
   const handleAddAssignee = () => {
-    if (assignInput.trim()) {
+    if (assignInput.email.trim()) {
       const emailExists = task.assignTo.some(
-        (person) => person.email === assignInput.trim()
+        (person) => person.email === assignInput.email.trim()
       );
 
       if (!emailExists) {
         const colors = [
-          "bg-blue-500",
-          "bg-green-500",
-          "bg-yellow-500",
-          "bg-purple-500",
-          "bg-pink-500",
-          "bg-indigo-500",
-          "bg-red-500",
+          "bg-blue-100 text-blue-800 font-semibold border-blue-500 rounded-md",
+          "bg-green-100 text-green-800 font-semibold border-green-500 rounded-md",
+          "bg-yellow-100 text-yellow-800 font-semibold border-yellow-500 rounded-md",
+          "bg-purple-100 text-purple-800 font-semibold border-purple-500 rounded-md",
+          "bg-pink-100 text-pink-800 font-semibold border-pink-500 rounded-md",
+          "bg-indigo-100 text-indigo-800 font-semibold border-indigo-500 rounded-md",
+          "bg-red-100 text-red-800 font-semibold border-red-500 rounded-md",
         ];
+
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
         const newAssignee = {
-          email: assignInput.trim(),
-          initials: assignInput.trim().substring(0, 2).toUpperCase(),
+          email: assignInput.email.trim(),
+          fullName: assignInput.fullName,
+          initials: assignInput.fullName
+            ?.split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase(),
           color: randomColor,
         };
 
         setTask({ ...task, assignTo: [...task.assignTo, newAssignee] });
       }
-      setAssignInput("");
+
+      setAssignInput({ email: "", fullName: "" });
     }
   };
 
@@ -99,7 +107,19 @@ export default function CreateTask() {
   };
 
   const handleSubmit = () => {
-    dispatch(createTaskThunk(task));
+    const formattedTask = {
+      ...task,
+      assignTo: task.assignTo.map((person) => ({
+        email: person.email,
+        status: "pending",
+      })),
+      todoCheckList: task.todoCheckList.map((item) => ({
+        text: item.text,
+        isCompleted: item.completed ?? false,
+      })),
+    };
+
+    dispatch(createTaskThunk(formattedTask));
     navigate("/admin/manage-task");
   };
 
@@ -197,8 +217,19 @@ export default function CreateTask() {
             <div className="flex mb-2">
               <select
                 id="assignTo"
-                value={assignInput}
-                onChange={(e) => setAssignInput(e.target.value)}
+                value={assignInput.email}
+                onChange={(e) => {
+                  const selectedEmail = e.target.value;
+                  const selected = employees.find(
+                    (emp) => emp.email === selectedEmail
+                  );
+                  if (selected) {
+                    setAssignInput({
+                      email: selected.email,
+                      fullName: selected.fullName,
+                    });
+                  }
+                }}
                 className="w-full border border-gray-300 px-4 py-2 rounded-l-md outline-none"
               >
                 <option value="">Select employee</option>
@@ -212,7 +243,7 @@ export default function CreateTask() {
               <button
                 type="button"
                 onClick={handleAddAssignee}
-                className="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600"
+                className="bg-violet-100 text-violet-800 font-semibold border border-violet-500 px-4 py-2 rounded-r-md hover:bg-violet-500 hover:text-white transition-colors cursor-pointer"
               >
                 Add
               </button>
@@ -223,18 +254,17 @@ export default function CreateTask() {
                 {task.assignTo.map((person, idx) => (
                   <div
                     key={idx}
-                    className={`${person.color} text-white px-3 py-1 rounded-full flex items-center text-sm shadow-sm`}
+                    className={`${person.color}  px-3 py-1 flex items-center text-sm shadow-sm`}
                   >
-                    <div className="w-5 h-5 rounded-full bg-white text-gray-800 flex items-center justify-center mr-2 font-bold text-xs">
-                      {person.initials}
-                    </div>
-                    <span className="mr-1">{person.email.split("@")[0]}</span>
+                    <Icon icon="mdi:account" className="mr-1 text-lg" />
+                    <span className="mr-1">{person.fullName}</span>
+
                     <button
                       onClick={() => removeAssignee(person.email)}
-                      className="ml-1 w-4 h-4 rounded-full bg-white/30 flex items-center justify-center hover:bg-white/50 text-white"
+                      className="ml-1 w-5 h-5 rounded-lg bg-gray-100 flex items-center justify-center text-gray-800 border-gray-500 border cursor-pointer"
                       title="Remove"
                     >
-                      <span className="text-xs">✕</span>
+                      X
                     </button>
                   </div>
                 ))}
@@ -264,9 +294,9 @@ export default function CreateTask() {
               <button
                 type="button"
                 onClick={handleAddTodoItem}
-                className="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600"
+                className="bg-violet-100 text-violet-800 font-semibold border border-violet-500 px-4 py-2 rounded-r-md hover:bg-violet-500 hover:text-white transition-colors cursor-pointer flex items-center space-x-2"
               >
-                Add
+                <span>Add</span>
               </button>
             </div>
 
@@ -292,9 +322,9 @@ export default function CreateTask() {
                     </span>
                     <button
                       onClick={() => removeTodoItem(index)}
-                      className="text-gray-500 cursor-pointer hover:text-red-500 ml-2"
+                      className=" cursor-pointer text-red-500 hover:text-red-900 ml-2"
                     >
-                      <span>🗑️</span>
+                      <Icon icon="mdi:trash-can" width={20} height={20} />
                     </button>
                   </div>
                 ))}
@@ -312,9 +342,9 @@ export default function CreateTask() {
         <div className="md:col-span-2">
           <button
             onClick={handleSubmit}
-            className="flex items-center gap-2 cursor-pointer w-fit bg-blue-100 text-blue-800 px-4 py-2 rounded-md hover:bg-blue-200 transition-colors font-medium"
+            className="flex items-center gap-2 cursor-pointer w-fit bg-gradient-to-r from-violet-100 to-violet-300 text-violet-800 px-4 py-2 rounded-md hover:bg-gradient-to-l transition-all font-medium border border-violet-500 shadow-md hover:shadow-lg"
           >
-            <span>📋</span>
+            <Icon icon="mdi:clipboard-check" width={20} height={20} />
             Create Task
           </button>
         </div>
