@@ -18,6 +18,20 @@ export const createTaskThunk = createAsyncThunk(
   }
 );
 
+export const getTasksThunk = createAsyncThunk(
+  "task/getTasks",
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await Axios.get("/task/get-all");
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to fetch tasks";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const taskSlice = createSlice({
   name: "task",
   initialState: {
@@ -42,6 +56,18 @@ const taskSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         toast.error(action.payload);
+      })
+      .addCase(getTasksThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getTasksThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = action.payload;
+      })
+      .addCase(getTasksThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
