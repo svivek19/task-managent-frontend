@@ -83,6 +83,14 @@ const AppLayout = () => {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/manage-task/:id"
+              element={
+                <ProtectedRoute>
+                  <CreateTask />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
       </div>

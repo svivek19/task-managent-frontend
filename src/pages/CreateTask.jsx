@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEmployees } from "../redux/features/employeeSlice";
-import { createTaskThunk } from "../redux/features/taskSlice";
-import { useNavigate } from "react-router-dom";
+import {
+  createTaskThunk,
+  getTaskById,
+  updateTask,
+} from "../redux/features/taskSlice";
+import { useNavigate, useParams } from "react-router-dom";
 import { Icon } from "@iconify/react";
 
 export default function CreateTask() {
+  const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { employees } = useSelector((state) => state.employee);
+  const { currentTask } = useSelector((state) => state.task);
 
   const [task, setTask] = useState({
     title: "",
@@ -54,6 +60,7 @@ export default function CreateTask() {
             .join("")
             .toUpperCase(),
           color: randomColor,
+          status: "pending",
         };
 
         setTask({ ...task, assignTo: [...task.assignTo, newAssignee] });
@@ -111,26 +118,78 @@ export default function CreateTask() {
       ...task,
       assignTo: task.assignTo.map((person) => ({
         email: person.email,
-        status: "pending",
+        fullName: person.fullName,
+        initials: person.initials,
+        color: person.color,
+        status: person.status || "pending",
       })),
       todoCheckList: task.todoCheckList.map((item) => ({
         text: item.text,
-        isCompleted: item.completed ?? false,
+        isCompleted: item.completed || false,
       })),
     };
 
-    dispatch(createTaskThunk(formattedTask));
-    navigate("/admin/manage-task");
+    if (id) {
+      dispatch(updateTask({ id, taskData: formattedTask }));
+      navigate(-1);
+    } else {
+      dispatch(createTaskThunk(formattedTask));
+      navigate("/admin/manage-task");
+    }
   };
 
   useEffect(() => {
     dispatch(getAllEmployees());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (id) {
+      dispatch(getTaskById(id));
+    }
+  }, [id, dispatch]);
+
+  useEffect(() => {
+    if (id && currentTask) {
+      const { title, description, priority, dueDate, assignTo, todoCheckList } =
+        currentTask;
+
+      setTask({
+        title: title || "",
+        description: description || "",
+        priority: priority || "low",
+        dueDate: dueDate ? dueDate.split("T")[0] : "",
+        assignTo: Array.isArray(assignTo)
+          ? assignTo.map((person) => ({
+              email: person.email,
+              fullName: person.fullName || "",
+              initials:
+                person.initials ||
+                person.fullName
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase() ||
+                "",
+              color:
+                person.color ||
+                "bg-blue-100 text-blue-800 font-semibold border-blue-500 rounded-md",
+              status: person.status || "pending",
+            }))
+          : [],
+        todoCheckList: Array.isArray(todoCheckList)
+          ? todoCheckList.map((item) => ({
+              text: item.text,
+              completed: item.isCompleted || false,
+            }))
+          : [],
+      });
+    }
+  }, [id, currentTask]);
+
   return (
     <div className="p-4 bg-white rounded-xl shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">
-        Create New Task
+        {id ? "Update Task" : "Create New Task"}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -254,10 +313,15 @@ export default function CreateTask() {
                 {task.assignTo.map((person, idx) => (
                   <div
                     key={idx}
-                    className={`${person.color}  px-3 py-1 flex items-center text-sm shadow-sm`}
+                    className={`${
+                      person.color ||
+                      "bg-blue-100 text-blue-800 font-semibold border-blue-500 rounded-md"
+                    } px-3 py-1 flex items-center text-sm shadow-sm`}
                   >
                     <Icon icon="mdi:account" className="mr-1 text-lg" />
-                    <span className="mr-1">{person.fullName}</span>
+                    <span className="mr-1">
+                      {person.fullName || person.email}
+                    </span>
 
                     <button
                       onClick={() => removeAssignee(person.email)}
@@ -322,7 +386,7 @@ export default function CreateTask() {
                     </span>
                     <button
                       onClick={() => removeTodoItem(index)}
-                      className=" cursor-pointer text-red-500 hover:text-red-900 ml-2"
+                      className="cursor-pointer text-red-500 hover:text-red-900 ml-2"
                     >
                       <Icon icon="mdi:trash-can" width={20} height={20} />
                     </button>
@@ -345,7 +409,7 @@ export default function CreateTask() {
             className="flex items-center gap-2 cursor-pointer w-fit bg-gradient-to-r from-violet-100 to-violet-300 text-violet-800 px-4 py-2 rounded-md hover:bg-gradient-to-l transition-all font-medium border border-violet-500 shadow-md hover:shadow-lg"
           >
             <Icon icon="mdi:clipboard-check" width={20} height={20} />
-            Create Task
+            {id ? "Update Task" : "Create New Task"}
           </button>
         </div>
       </div>

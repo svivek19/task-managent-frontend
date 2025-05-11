@@ -4,6 +4,7 @@ import { formatDate } from "../services/format";
 import AssigneeAvatars from "./AssigneeAvatars";
 import { Icon } from "@iconify/react";
 import { exportTasksToExcel } from "../services/exportToExcel";
+import { Link } from "react-router-dom";
 
 const TaskCard = ({ tasks }) => {
   const [filterStatus, setFilterStatus] = useState("All");
@@ -87,7 +88,7 @@ const TaskCard = ({ tasks }) => {
               <button
                 key={status}
                 onClick={() => setFilterStatus(status)}
-                className={`px-3 py-1 font-medium rounded ${
+                className={`px-3 py-1 font-medium rounded cursor-pointer ${
                   filterStatus === status
                     ? "text-blue-700 border-b-2 border-blue-500"
                     : "text-slate-700"
@@ -122,7 +123,8 @@ const TaskCard = ({ tasks }) => {
               const priorityColorClass = getPriorityColorClass(task.priority);
 
               return (
-                <div
+                <Link
+                  to={`/admin/manage-task/${task._id}`}
                   className="bg-white shadow-md rounded flex flex-col gap-2"
                   key={idx}
                 >
@@ -179,7 +181,7 @@ const TaskCard = ({ tasks }) => {
                   <div className="px-4 pb-2">
                     <AssigneeAvatars assignees={task.assignTo} />
                   </div>
-                </div>
+                </Link>
               );
             })
           )}
