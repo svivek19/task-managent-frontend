@@ -55,7 +55,6 @@ const taskSlice = createSlice({
       .addCase(createTaskThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        toast.error(action.payload);
       })
       .addCase(getTasksThunk.pending, (state) => {
         state.loading = true;

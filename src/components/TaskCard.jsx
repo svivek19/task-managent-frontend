@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import ProgressBar from "./PregressBar";
 import { formatDate } from "../services/format";
 import AssigneeAvatars from "./AssigneeAvatars";
+import { Icon } from "@iconify/react";
+import { exportTasksToExcel } from "../services/exportToExcel";
 
 const TaskCard = ({ tasks }) => {
   const [filterStatus, setFilterStatus] = useState("All");
@@ -57,26 +59,50 @@ const TaskCard = ({ tasks }) => {
     return filterStatus === "All" || status === filterStatus;
   });
 
+  const getTaskStatus = (todoCheckList) => {
+    const total = todoCheckList?.length || 0;
+    const completed = todoCheckList?.filter((t) => t.isCompleted).length || 0;
+
+    if (total === 0) return "Pending";
+    if (completed === total) return "Completed";
+    if (completed > 0 && completed < total) return "In Progress";
+    return "Pending";
+  };
+
   return (
     <div className="flex flex-col">
-      <div className="bg-white p-4 shadow-md sticky top-0 z-10 flex justify-between items-center">
-        <h1 className="font-semibold text-lg mb-2">My Tasks</h1>
-        <div className="flex gap-2">
-          {["All", "Pending", "In Progress", "Completed"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
-              className={`px-3 py-1 font-medium cursor-pointer ${
-                filterStatus === status
-                  ? " text-blue-700 border-b-2 border-blue-500"
-                  : " text-slate-700"
-              }`}
-            >
-              {status} ({status.length})
-            </button>
-          ))}
+      <div className="bg-white p-4 shadow-md sticky top-0 z-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+        <h1 className="font-semibold text-lg">My Tasks</h1>
 
-          <button className="bg-lime-100 px-2 py-1 rounded-md text-lime-700 font-medium cursor-pointer hover:bg-lime-200 transition duration-300">
+        <div className="flex flex-wrap gap-2 items-center">
+          {["All", "Pending", "In Progress", "Completed"].map((status) => {
+            const count =
+              status === "All"
+                ? tasks.length
+                : tasks.filter(
+                    (task) => getTaskStatus(task.todoCheckList) === status
+                  ).length;
+
+            return (
+              <button
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                className={`px-3 py-1 font-medium rounded ${
+                  filterStatus === status
+                    ? "text-blue-700 border-b-2 border-blue-500"
+                    : "text-slate-700"
+                }`}
+              >
+                {status} ({count})
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => exportTasksToExcel(tasks)}
+            className="cursor-pointer bg-lime-100 px-3 py-1 rounded-md text-lime-700 font-medium hover:bg-lime-200 transition duration-300 flex items-center gap-2"
+          >
+            <Icon icon="file-icons:microsoft-excel" width="14" height="14" />
             Download Report
           </button>
         </div>
