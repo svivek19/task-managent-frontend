@@ -10,10 +10,10 @@ import { useDispatch, useSelector } from "react-redux";
 import Auth from "./pages/Auth";
 import { fetchCurrentUser } from "./redux/features/userSlice";
 import Sidebar from "./components/Sidebar";
-import AdminDashboard from "./pages/AdminDashboard";
 import Employee from "./pages/Employee";
 import CreateTask from "./pages/CreateTask";
 import ManageTask from "./pages/ManageTask";
+import Dashboard from "./pages/Dashboard";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector((state) => state.user);
@@ -55,7 +55,7 @@ const AppLayout = () => {
               path="/admin/dashboard"
               element={
                 <ProtectedRoute>
-                  <AdminDashboard />
+                  <Dashboard />
                 </ProtectedRoute>
               }
             />
