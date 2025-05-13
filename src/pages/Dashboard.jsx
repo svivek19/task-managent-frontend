@@ -5,13 +5,16 @@ import { getTasksThunk } from "../redux/features/taskSlice";
 import TaskCountElement from "../components/TaskCountElement";
 import DoughnutChart from "../components/charts/DoughnutChart";
 import BarChart from "../components/charts/BarChart";
+import { Icon } from "@iconify/react";
+import { Link } from "react-router-dom";
+import TaskTable from "../components/TaskTable";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const today = new Date();
   const { user } = useSelector((state) => state.user);
-  const { tasks } = useSelector((state) => state.task);
+  const { tasks, loading, error } = useSelector((state) => state.task);
 
   function getFormattedDate(date) {
     const day = date.getDate();
@@ -115,6 +118,27 @@ const Dashboard = () => {
         </div>
         <div className="bg-white shadow-md p-6 rounded-lg w-full">
           <BarChart priorityCount={priorityCount} />
+        </div>
+      </div>
+
+      <div className="bg-white shadow-md p-4 space-y-2 rounded-lg">
+        <div className="flex justify-between flex-wrap items-center gap-4">
+          <h1 className="font-medium">Recent Tasks </h1>
+
+          <Link>
+            <button className="flex items-center gap-2 border border-violet-500 rounded-md text-violet-700 px-2 py-1 cursor-pointer hover:bg-violet-50 transition-colors">
+              See all{" "}
+              <Icon
+                icon="material-symbols:arrow-right-alt-rounded"
+                width="24"
+                height="24"
+              />
+            </button>
+          </Link>
+        </div>
+
+        <div>
+          <TaskTable tasks={tasks} loading={loading} error={error} />
         </div>
       </div>
     </div>
