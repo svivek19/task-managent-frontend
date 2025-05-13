@@ -1,11 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCurrentUser } from "../redux/features/userSlice";
 import { getTasksThunk } from "../redux/features/taskSlice";
 import TaskCountElement from "../components/TaskCountElement";
+import DoughnutChart from "../components/charts/DoughnutChart";
+import BarChart from "../components/charts/BarChart";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   const today = new Date();
   const { user } = useSelector((state) => state.user);
   const { tasks } = useSelector((state) => state.task);
@@ -31,42 +34,88 @@ const Dashboard = () => {
     return `${weekday}, ${day}${daySuffix} ${month} ${year}`;
   }
 
-  const taskStatuses = tasks.map((task) => {
-    const checklist = task.todoCheckList || [];
-
-    const total = checklist.length;
-    const completed = checklist.filter((item) => item.isCompleted).length;
-
-    if (completed === total && total > 0) return "Completed";
-    if (completed === 0) return "Pending";
-    return "InProgress";
-  });
-
-  const statusCount = taskStatuses.reduce((acc, status) => {
-    acc[status] = (acc[status] || 0) + 1;
-    return acc;
-  }, {});
-
   useEffect(() => {
-    dispatch(fetchCurrentUser);
-    dispatch(getTasksThunk());
-  }, []);
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        await dispatch(fetchCurrentUser);
+        await dispatch(getTasksThunk());
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  const taskStatuses = useMemo(() => {
+    return tasks.map((task) => {
+      const checklist = task.todoCheckList || [];
+
+      const total = checklist.length;
+      const completed = checklist.filter((item) => item?.isCompleted).length;
+
+      if (completed === total && total > 0) return "Completed";
+      if (completed === 0) return "Pending";
+      return "InProgress";
+    });
+  }, [tasks]);
+
+  const statusCount = useMemo(() => {
+    return taskStatuses.reduce((acc, status) => {
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+  }, [taskStatuses]);
+
+  const priorityCount = useMemo(() => {
+    return tasks.reduce((acc, task) => {
+      const priority = task.priority || "Unknown";
+      acc[priority] = (acc[priority] || 0) + 1;
+      return acc;
+    }, {});
+  }, [tasks]);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-6 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white shadow p-4 rounded-md">
-      <h1 className="text-xl font-semibold mb-1 capitalize inline-flex items-center gap-2">
-        Good Morning, {user?.fullName || "User"}{" "}
-        <p className="text-xs bg-blue-800 px-2 py-1 rounded-md text-white capitalize">
-          {user?.role}
-        </p>
-      </h1>
-      <p className="text-gray-500">{getFormattedDate(today)}</p>
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className="bg-white shadow-md p-6 rounded-lg">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2 capitalize flex items-center gap-2">
+              Good Morning, {user?.fullName || "User"}
+              {user?.role && (
+                <span className="text-xs bg-blue-800 px-2 py-1 rounded-md text-white capitalize">
+                  {user?.role}
+                </span>
+              )}
+            </h1>
+            <p className="text-gray-500 text-sm">{getFormattedDate(today)}</p>
+          </div>
+        </div>
 
-      <div>
         <TaskCountElement
           statusCount={statusCount}
           total={taskStatuses.length}
         />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white shadow-md p-6 rounded-lg w-full">
+          <DoughnutChart statusCount={statusCount} />
+        </div>
+        <div className="bg-white shadow-md p-6 rounded-lg w-full">
+          <BarChart priorityCount={priorityCount} />
+        </div>
       </div>
     </div>
   );

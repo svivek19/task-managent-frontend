@@ -1,7 +1,6 @@
 import React from "react";
 
 const TaskCountElement = ({ statusCount, total }) => {
-  console.log(statusCount, total);
   return (
     <div>
       {" "}
