@@ -107,7 +107,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md flex justify-around items-center p-2 md:hidden z-50 ">
+      <div className="fixed bottom-0 left-0 right-0 bg-white backdrop-blur-lg border-t shadow-md flex justify-around items-center p-4 md:hidden z-50 ">
         {sideMenus.map((item, index) => (
           <NavLink
             key={index}
@@ -118,14 +118,14 @@ const Sidebar = () => {
               }`
             }
           >
-            <Icon icon={item.icon} width="24" height="24" />
+            <Icon icon={item.icon} width="28" height="28" />
           </NavLink>
         ))}
         <button
           onClick={handleLogout}
           className="text-red-600 flex flex-col items-center"
         >
-          <Icon icon="fluent:arrow-exit-32-filled" width="24" height="24" />
+          <Icon icon="fluent:arrow-exit-32-filled" width="28" height="28" />
         </button>
       </div>
     </>
