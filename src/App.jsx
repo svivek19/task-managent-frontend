@@ -51,6 +51,7 @@ const AppLayout = () => {
         <Sidebar />
         <main className="flex-1 overflow-y-auto bg-gray-100 p-4 pb-20 md:pb-0">
           <Routes>
+            {/* Admin */}
             <Route
               path="/admin/dashboard"
               element={
@@ -85,6 +86,33 @@ const AppLayout = () => {
             />
             <Route
               path="/admin/manage-task/:id"
+              element={
+                <ProtectedRoute>
+                  <CreateTask />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Employees */}
+            <Route
+              path="/employee/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/employee/manage-task"
+              element={
+                <ProtectedRoute>
+                  <ManageTask />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employee/manage-task/:id"
               element={
                 <ProtectedRoute>
                   <CreateTask />

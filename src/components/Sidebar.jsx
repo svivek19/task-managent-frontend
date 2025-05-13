@@ -1,13 +1,14 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/features/userSlice";
 import { toast } from "sonner";
 import { Modal } from "antd";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
 
   const adminSideItems = [
     {
@@ -31,6 +32,22 @@ const Sidebar = () => {
       title: "Team",
     },
   ];
+
+  const employeeSideItems = [
+    {
+      path: "/employee/dashboard",
+      icon: "fluent-color:apps-list-detail-24",
+      title: "Overview",
+    },
+    {
+      path: "/employee/manage-task",
+      icon: "fluent-color:bot-sparkle-24",
+      title: "Tasks",
+    },
+  ];
+
+  const sideMenus =
+    user?.role === "employee" ? [...employeeSideItems] : [...adminSideItems];
 
   const handleLogout = () => {
     Modal.confirm({
@@ -60,7 +77,7 @@ const Sidebar = () => {
           </h1>
 
           <nav className="flex flex-col p-4 gap-2">
-            {adminSideItems.map((item, index) => (
+            {sideMenus.map((item, index) => (
               <NavLink
                 key={index}
                 to={item.path}
@@ -91,7 +108,7 @@ const Sidebar = () => {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md flex justify-around items-center p-2 md:hidden z-50 ">
-        {adminSideItems.map((item, index) => (
+        {sideMenus.map((item, index) => (
           <NavLink
             key={index}
             to={item.path}
