@@ -6,7 +6,7 @@ import { Icon } from "@iconify/react";
 import { exportTasksToExcel } from "../services/exportToExcel";
 import { Link } from "react-router-dom";
 
-const TaskCard = ({ tasks }) => {
+const TaskCard = ({ tasks, user }) => {
   const [filterStatus, setFilterStatus] = useState("All");
 
   if (!Array.isArray(tasks)) return null;
@@ -124,7 +124,7 @@ const TaskCard = ({ tasks }) => {
 
               return (
                 <Link
-                  to={`/admin/manage-task/${task._id}`}
+                  to={`/${user?.role}/manage-task/${task._id}`}
                   className="bg-white shadow-md rounded flex flex-col gap-2"
                   key={idx}
                 >

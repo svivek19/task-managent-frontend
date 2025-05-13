@@ -6,6 +6,7 @@ import { getTasksThunk } from "../redux/features/taskSlice";
 const ManageTask = () => {
   const dispatch = useDispatch();
   const { tasks, loading, error } = useSelector((state) => state.task);
+  const { user } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(getTasksThunk());
@@ -21,7 +22,7 @@ const ManageTask = () => {
           </div>
         ))}
       <div>
-        <TaskCard tasks={tasks} />
+        <TaskCard tasks={tasks} user={user} />
       </div>
     </div>
   );
