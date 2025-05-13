@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCurrentUser } from "../redux/features/userSlice";
-import { getTasksThunk } from "../redux/features/taskSlice";
+import { getTasksThunk, getRecentTask } from "../redux/features/taskSlice";
 import TaskCountElement from "../components/TaskCountElement";
 import DoughnutChart from "../components/charts/DoughnutChart";
 import BarChart from "../components/charts/BarChart";
@@ -14,7 +14,9 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const today = new Date();
   const { user } = useSelector((state) => state.user);
-  const { tasks, loading, error } = useSelector((state) => state.task);
+  const { tasks, loading, error, recentTask } = useSelector(
+    (state) => state.task
+  );
 
   function getFormattedDate(date) {
     const day = date.getDate();
@@ -43,6 +45,7 @@ const Dashboard = () => {
         setIsLoading(true);
         await dispatch(fetchCurrentUser);
         await dispatch(getTasksThunk());
+        await dispatch(getRecentTask());
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -138,7 +141,7 @@ const Dashboard = () => {
         </div>
 
         <div>
-          <TaskTable tasks={tasks} loading={loading} error={error} />
+          <TaskTable tasks={recentTask} loading={loading} error={error} />
         </div>
       </div>
     </div>

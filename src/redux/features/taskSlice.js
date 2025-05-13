@@ -50,6 +50,20 @@ export const getTasksThunk = createAsyncThunk(
   }
 );
 
+export const getRecentTask = createAsyncThunk(
+  "task/getRecentTask",
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await Axios.get("/task/get-recent");
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to fetch tasks";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const getTaskById = createAsyncThunk(
   "task/getbyid",
   async (id, { rejectWithValue }) => {
@@ -68,6 +82,7 @@ const taskSlice = createSlice({
   name: "task",
   initialState: {
     tasks: [],
+    recentTask: [],
     currentTask: null,
     loading: false,
     error: null,
@@ -98,6 +113,18 @@ const taskSlice = createSlice({
         state.tasks = action.payload;
       })
       .addCase(getTasksThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getRecentTask.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getRecentTask.fulfilled, (state, action) => {
+        state.loading = false;
+        state.recentTask = action.payload;
+      })
+      .addCase(getRecentTask.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
