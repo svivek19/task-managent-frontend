@@ -1,13 +1,17 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCurrentUser } from "../redux/features/userSlice";
-import { getTasksThunk, getRecentTask } from "../redux/features/taskSlice";
 import TaskCountElement from "../components/TaskCountElement";
 import DoughnutChart from "../components/charts/DoughnutChart";
 import BarChart from "../components/charts/BarChart";
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import TaskTable from "../components/TaskTable";
+import {
+  getTasksThunk,
+  getRecentTask,
+  assigneeTask,
+} from "../redux/features/taskSlice";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -44,8 +48,13 @@ const Dashboard = () => {
       try {
         setIsLoading(true);
         await dispatch(fetchCurrentUser);
-        await dispatch(getTasksThunk());
+
         await dispatch(getRecentTask());
+        if (user?.role === "employee") {
+          await dispatch(assigneeTask(user?.email));
+        } else {
+          await dispatch(getTasksThunk());
+        }
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -54,7 +63,7 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, user]);
 
   const taskStatuses = useMemo(() => {
     return tasks.map((task) => {
@@ -92,13 +101,21 @@ const Dashboard = () => {
     );
   }
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Good Morning";
+    if (hour >= 12 && hour < 17) return "Good Afternoon";
+    if (hour >= 17 && hour < 21) return "Good Evening";
+    return "Good Night";
+  };
+
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       <div className="bg-white shadow-md p-6 rounded-lg">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2 capitalize flex items-center gap-2">
-              Good Morning, {user?.fullName || "User"}
+            <h1 className="text-2xl font-bold text-gray-800 mb-2 capitalize flex items-center gap-2 flex-wrap">
+              {getGreeting()}, {user?.fullName || "User"}
               {user?.role && (
                 <span className="text-xs bg-blue-800 px-2 py-1 rounded-md text-white capitalize">
                   {user?.role}
@@ -128,7 +145,7 @@ const Dashboard = () => {
         <div className="flex justify-between flex-wrap items-center gap-4">
           <h1 className="font-medium">Recent Tasks </h1>
 
-          <Link>
+          <Link to={`/${user.role}/manage-task`}>
             <button className="flex items-center gap-2 border border-violet-500 rounded-md text-violet-700 px-2 py-1 cursor-pointer hover:bg-violet-50 transition-colors">
               See all{" "}
               <Icon

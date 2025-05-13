@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import TaskCard from "../components/TaskCard";
 import { useDispatch, useSelector } from "react-redux";
-import { getTasksThunk } from "../redux/features/taskSlice";
+import { assigneeTask, getTasksThunk } from "../redux/features/taskSlice";
 
 const ManageTask = () => {
   const dispatch = useDispatch();
@@ -9,7 +9,11 @@ const ManageTask = () => {
   const { user } = useSelector((state) => state.user);
 
   useEffect(() => {
-    dispatch(getTasksThunk());
+    if (user?.role === "employee") {
+      dispatch(assigneeTask(user?.email));
+    } else {
+      dispatch(getTasksThunk());
+    }
   }, []);
 
   return (

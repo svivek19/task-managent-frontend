@@ -98,14 +98,15 @@ const TaskCard = ({ tasks, user }) => {
               </button>
             );
           })}
-
-          <button
-            onClick={() => exportTasksToExcel(tasks)}
-            className="cursor-pointer bg-lime-100 px-3 py-1 rounded-md text-lime-700 font-medium hover:bg-lime-200 transition duration-300 flex items-center gap-2"
-          >
-            <Icon icon="file-icons:microsoft-excel" width="14" height="14" />
-            Download Report
-          </button>
+          {user?.role === "admin" && (
+            <button
+              onClick={() => exportTasksToExcel(tasks)}
+              className="cursor-pointer bg-lime-100 px-3 py-1 rounded-md text-lime-700 font-medium hover:bg-lime-200 transition duration-300 flex items-center gap-2"
+            >
+              <Icon icon="file-icons:microsoft-excel" width="14" height="14" />
+              Download Report
+            </button>
+          )}
         </div>
       </div>
 
