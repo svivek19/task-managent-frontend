@@ -75,10 +75,6 @@ const TaskCard = ({ tasks, user }) => {
 
   const handleDelete = async (id) => {
     await dispatch(deleteTaskById(id)).unwrap();
-
-    if (window.location.pathname.includes(`/manage-task/${id}`)) {
-      navigate(`/${user?.role}/tasks`);
-    }
   };
 
   return (

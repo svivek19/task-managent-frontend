@@ -9,7 +9,7 @@ import {
 
 const ManageTask = () => {
   const dispatch = useDispatch();
-  const { tasks, loading, error } = useSelector((state) => state.task);
+  const { tasks, loading } = useSelector((state) => state.task);
   const { user } = useSelector((state) => state.user);
 
   useEffect(() => {
