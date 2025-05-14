@@ -141,7 +141,7 @@ const Sidebar = () => {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white backdrop-blur-lg border-t shadow-md p-2 md:hidden z-50">
-        <div className="flex items-center overflow-x-auto no-scrollbar gap-6 px-4">
+        <div className="flex items-center justify-between overflow-x-auto no-scrollbar gap-6 px-4">
           {menuItems.map((item, index) => (
             <NavLink
               key={index}
