@@ -14,12 +14,17 @@ import Employee from "./pages/Employee";
 import CreateTask from "./pages/CreateTask";
 import ManageTask from "./pages/ManageTask";
 import Dashboard from "./pages/Dashboard";
+import { Skeleton } from "antd";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector((state) => state.user);
 
   if (loading)
-    return <div className="text-center mt-20 text-xl">Loading...</div>;
+    return (
+      <div className="p-8">
+        <Skeleton active />
+      </div>
+    );
   if (!isAuthenticated) return <Navigate to="/" />;
   return children;
 };

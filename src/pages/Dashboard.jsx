@@ -15,7 +15,6 @@ import {
 
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(true);
   const today = new Date();
   const { user } = useSelector((state) => state.user);
   const { tasks, loading, error, recentTask } = useSelector(
@@ -46,7 +45,6 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
         await dispatch(fetchCurrentUser);
 
         await dispatch(getRecentTask());
@@ -57,8 +55,6 @@ const Dashboard = () => {
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -92,14 +88,6 @@ const Dashboard = () => {
       return acc;
     }, {});
   }, [tasks]);
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6 flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-      </div>
-    );
-  }
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -145,7 +133,7 @@ const Dashboard = () => {
         <div className="flex justify-between flex-wrap items-center gap-4">
           <h1 className="font-medium">Recent Tasks </h1>
 
-          <Link to={`/${user.role}/manage-task`}>
+          <Link to={`/${user?.role}/manage-task`}>
             <button className="flex items-center gap-2 border border-violet-500 rounded-md text-violet-700 px-2 py-1 cursor-pointer hover:bg-violet-50 transition-colors">
               See all{" "}
               <Icon
