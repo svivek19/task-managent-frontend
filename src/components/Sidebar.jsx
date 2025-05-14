@@ -140,28 +140,31 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white backdrop-blur-lg border-t shadow-md flex justify-around items-center p-4 md:hidden z-50">
-        {menuItems.map((item, index) => (
-          <NavLink
-            key={index}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex flex-col items-center text-xs ${
-                isActive ? "text-blue-600" : "text-gray-600"
-              }`
-            }
+      <div className="fixed bottom-0 left-0 right-0 bg-white backdrop-blur-lg border-t shadow-md p-2 md:hidden z-50">
+        <div className="flex items-center overflow-x-auto no-scrollbar gap-6 px-4">
+          {menuItems.map((item, index) => (
+            <NavLink
+              key={index}
+              to={item.path}
+              className={({ isActive }) =>
+                `flex flex-col items-center text-xs shrink-0 ${
+                  isActive ? "text-blue-600" : "text-gray-600"
+                }`
+              }
+            >
+              <Icon icon={item.icon} width="28" height="28" />
+              <span className="mt-1">{item.title}</span>
+            </NavLink>
+          ))}
+
+          <button
+            onClick={handleLogout}
+            className="text-red-600 flex flex-col items-center text-xs shrink-0"
           >
-            <Icon icon={item.icon} width="28" height="28" />
-            <span className="mt-1">{item.title}</span>
-          </NavLink>
-        ))}
-        <button
-          onClick={handleLogout}
-          className="text-red-600 flex flex-col items-center text-xs"
-        >
-          <Icon icon="fluent:arrow-exit-32-filled" width="28" height="28" />
-          <span className="mt-1">Logout</span>
-        </button>
+            <Icon icon="fluent:arrow-exit-32-filled" width="28" height="28" />
+            <span className="mt-1">Logout</span>
+          </button>
+        </div>
       </div>
     </>
   );

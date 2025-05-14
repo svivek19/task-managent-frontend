@@ -112,7 +112,7 @@ const LoginForm = () => {
         </div>
       </div>
 
-      <div className="bg-blue-900 text-white flex flex-col justify-center items-center px-10 py-16 space-y-8">
+      <div className="max-sm:hidden bg-blue-900 text-white flex flex-col justify-center items-center px-10 py-16 space-y-8">
         <h1 className="text-5xl font-bold">TaskFlow</h1>
         <p className="text-center text-lg max-w-md">
           Stay organized and productive. Log in to access your personalized task
