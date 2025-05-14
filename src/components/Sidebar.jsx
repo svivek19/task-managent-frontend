@@ -1,14 +1,17 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/features/userSlice";
 import { toast } from "sonner";
 import { Modal } from "antd";
+import { clearTasks } from "../redux/features/taskSlice";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
+  const [menuItems, setMenuItems] = useState([]);
 
   const adminSideItems = [
     {
@@ -46,8 +49,32 @@ const Sidebar = () => {
     },
   ];
 
-  const sideMenus =
-    user?.role === "employee" ? [...employeeSideItems] : [...adminSideItems];
+  useEffect(() => {
+    if (!user) {
+      setMenuItems([]);
+      return;
+    }
+
+    if (user.role === "employee") {
+      setMenuItems([...employeeSideItems]);
+    } else if (user.role === "admin") {
+      setMenuItems([...adminSideItems]);
+    } else {
+      setMenuItems([]);
+    }
+
+    if (
+      user.role === "employee" &&
+      window.location.pathname.includes("/admin")
+    ) {
+      navigate("/employee/dashboard");
+    } else if (
+      user.role === "admin" &&
+      window.location.pathname.includes("/employee")
+    ) {
+      navigate("/admin/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleLogout = () => {
     Modal.confirm({
@@ -56,11 +83,17 @@ const Sidebar = () => {
       okText: "Yes",
       cancelText: "No",
       onOk: () => {
+        dispatch(clearTasks());
         dispatch(logout());
         toast.info("Session ended successfully.");
+        navigate("/");
       },
     });
   };
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <>
@@ -77,7 +110,7 @@ const Sidebar = () => {
           </h1>
 
           <nav className="flex flex-col p-4 gap-2">
-            {sideMenus.map((item, index) => (
+            {menuItems.map((item, index) => (
               <NavLink
                 key={index}
                 to={item.path}
@@ -107,8 +140,8 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white backdrop-blur-lg border-t shadow-md flex justify-around items-center p-4 md:hidden z-50 ">
-        {sideMenus.map((item, index) => (
+      <div className="fixed bottom-0 left-0 right-0 bg-white backdrop-blur-lg border-t shadow-md flex justify-around items-center p-4 md:hidden z-50">
+        {menuItems.map((item, index) => (
           <NavLink
             key={index}
             to={item.path}
@@ -119,13 +152,15 @@ const Sidebar = () => {
             }
           >
             <Icon icon={item.icon} width="28" height="28" />
+            <span className="mt-1">{item.title}</span>
           </NavLink>
         ))}
         <button
           onClick={handleLogout}
-          className="text-red-600 flex flex-col items-center"
+          className="text-red-600 flex flex-col items-center text-xs"
         >
           <Icon icon="fluent:arrow-exit-32-filled" width="28" height="28" />
+          <span className="mt-1">Logout</span>
         </button>
       </div>
     </>
