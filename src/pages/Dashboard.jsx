@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCurrentUser } from "../redux/features/userSlice";
 import TaskCountElement from "../components/TaskCountElement";
@@ -11,6 +11,7 @@ import {
   getTasksThunk,
   getRecentTask,
   assigneeTask,
+  clearTasks,
 } from "../redux/features/taskSlice";
 
 const Dashboard = () => {
@@ -43,22 +44,21 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(fetchCurrentUser);
+    dispatch(fetchCurrentUser);
+  }, [dispatch]);
 
-        await dispatch(getRecentTask());
-        if (user?.role === "employee") {
-          await dispatch(assigneeTask(user?.email));
-        } else {
-          await dispatch(getTasksThunk());
-        }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
+  useEffect(() => {
+    if (user) {
+      dispatch(clearTasks());
+
+      dispatch(getRecentTask());
+
+      if (user.role === "employee") {
+        dispatch(assigneeTask(user.email));
+      } else {
+        dispatch(getTasksThunk());
       }
-    };
-
-    fetchData();
+    }
   }, [dispatch, user]);
 
   const taskStatuses = useMemo(() => {

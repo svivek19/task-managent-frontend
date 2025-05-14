@@ -103,6 +103,12 @@ const taskSlice = createSlice({
     token: localStorage.getItem("token") || null,
   },
 
+  reducers: {
+    clearTasks: (state) => {
+      state.tasks = [];
+    },
+  },
+
   extraReducers: (builder) => {
     builder
       .addCase(createTaskThunk.pending, (state) => {
@@ -133,6 +139,7 @@ const taskSlice = createSlice({
       .addCase(assigneeTask.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.tasks = [];
       })
       .addCase(assigneeTask.fulfilled, (state, action) => {
         state.loading = false;
@@ -187,6 +194,6 @@ const taskSlice = createSlice({
   },
 });
 
-export const {} = taskSlice.actions;
+export const { clearTasks } = taskSlice.actions;
 
 export default taskSlice.reducer;
