@@ -92,6 +92,22 @@ export const getTaskById = createAsyncThunk(
   }
 );
 
+export const deleteTaskById = createAsyncThunk(
+  "task/deleteTaskById",
+  async (id, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await Axios.delete("/task/delete/" + id);
+      toast.success("Task deleted successfully.");
+      await dispatch(getTasksThunk());
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to delete task";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const taskSlice = createSlice({
   name: "task",
   initialState: {
@@ -127,6 +143,18 @@ const taskSlice = createSlice({
       .addCase(getTasksThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
+      })
+      .addCase(deleteTaskById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteTaskById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = state.tasks.filter((task) => task._id !== action.payload);
+      })
+      .addCase(deleteTaskById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       .addCase(getTasksThunk.fulfilled, (state, action) => {
         state.loading = false;

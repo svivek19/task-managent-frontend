@@ -5,9 +5,12 @@ import AssigneeAvatars from "./AssigneeAvatars";
 import { Icon } from "@iconify/react";
 import { exportTasksToExcel } from "../services/exportToExcel";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { deleteTaskById } from "../redux/features/taskSlice";
 
 const TaskCard = ({ tasks, user }) => {
   const [filterStatus, setFilterStatus] = useState("All");
+  const dispatch = useDispatch();
 
   if (!Array.isArray(tasks)) return null;
 
@@ -70,6 +73,14 @@ const TaskCard = ({ tasks, user }) => {
     return "Pending";
   };
 
+  const handleDelete = async (id) => {
+    await dispatch(deleteTaskById(id)).unwrap();
+
+    if (window.location.pathname.includes(`/manage-task/${id}`)) {
+      navigate(`/${user?.role}/tasks`);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <div className="bg-white p-4 shadow-md sticky top-0 z-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
@@ -129,7 +140,7 @@ const TaskCard = ({ tasks, user }) => {
                   className="bg-white shadow-md rounded flex flex-col gap-2"
                   key={idx}
                 >
-                  <div className="flex gap-2 p-4">
+                  <div className="flex gap-2 p-4 relative">
                     <div
                       className={`${colorClass} px-2 py-1 rounded font-medium text-sm`}
                     >
@@ -140,6 +151,23 @@ const TaskCard = ({ tasks, user }) => {
                     >
                       {task.priority} Priority
                     </div>
+
+                    {user?.role === "admin" && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault(); // Prevent the link navigation
+                          handleDelete(task._id); // Execute the delete function
+                          e.stopPropagation(); // Prevent event bubbling
+                        }}
+                        className="absolute top-2 right-2"
+                      >
+                        <Icon
+                          icon="mdi:delete"
+                          width="24"
+                          className="cursor-pointer text-red-500"
+                        />
+                      </button>
+                    )}
                   </div>
 
                   <div className={`border-l-2 ${borderColor} pl-4 pr-2`}>

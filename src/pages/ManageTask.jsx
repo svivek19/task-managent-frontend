@@ -29,13 +29,7 @@ const ManageTask = () => {
         </div>
       )}
 
-      {error && (
-        <div className="bg-white p-4 rounded shadow-md">
-          <p className="text-red-500">{error}</p>
-        </div>
-      )}
-
-      {!loading && !error && tasks && (
+      {!loading && tasks && (
         <div>
           <TaskCard tasks={tasks} user={user} />
         </div>
