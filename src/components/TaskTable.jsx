@@ -23,7 +23,7 @@ const TaskTable = ({ tasks, loading, error }) => {
       {loading ? (
         <p className="text-center text-gray-500">Loading tasks...</p>
       ) : error ? (
-        <p className="text-center text-red-500">Error: {error}</p>
+        <p className="text-center text-red-500"> {error}</p>
       ) : tasks.length === 0 ? (
         <p className="text-center text-gray-500">No tasks found.</p>
       ) : (
