@@ -40,10 +40,6 @@ const ManageTask = () => {
           <TaskCard tasks={tasks} user={user} />
         </div>
       )}
-
-      <div>
-        <TaskCard tasks={tasks} user={user} />
-      </div>
     </div>
   );
 };
