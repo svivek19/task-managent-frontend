@@ -13,8 +13,11 @@ export default function CreateTask() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
   const { employees } = useSelector((state) => state.employee);
   const { currentTask } = useSelector((state) => state.task);
+
+  const isEmployee = user?.role === "employee";
 
   const [task, setTask] = useState({
     title: "",
@@ -209,6 +212,7 @@ export default function CreateTask() {
               onChange={handleChange}
               placeholder="Enter task title"
               className="w-full border border-gray-300 px-4 py-2 rounded-md outline-none"
+              disabled={isEmployee}
             />
           </div>
 
@@ -227,6 +231,7 @@ export default function CreateTask() {
               placeholder="Describe the task..."
               className="w-full border resize-none border-gray-300 px-4 py-2 rounded-md outline-none"
               rows={5}
+              disabled={isEmployee}
             />
           </div>
 
@@ -242,6 +247,7 @@ export default function CreateTask() {
               name="priority"
               value={task.priority}
               onChange={handleChange}
+              disabled={isEmployee}
               className="w-full border border-gray-300 px-4 py-2 rounded-md outline-none"
             >
               <option value="low">Low</option>
@@ -262,6 +268,7 @@ export default function CreateTask() {
               id="dueDate"
               name="dueDate"
               value={task.dueDate}
+              disabled={isEmployee}
               onChange={handleChange}
               className="w-full border border-gray-300 px-4 py-2 rounded-md outline-none"
             />
@@ -277,6 +284,7 @@ export default function CreateTask() {
               <select
                 id="assignTo"
                 value={assignInput.email}
+                disabled={isEmployee}
                 onChange={(e) => {
                   const selectedEmail = e.target.value;
                   const selected = employees.find(
@@ -325,6 +333,7 @@ export default function CreateTask() {
 
                     <button
                       onClick={() => removeAssignee(person.email)}
+                      disabled={isEmployee}
                       className="ml-1 w-5 h-5 rounded-lg bg-gray-100 flex items-center justify-center text-gray-800 border-gray-500 border cursor-pointer"
                       title="Remove"
                     >
@@ -352,11 +361,13 @@ export default function CreateTask() {
                 value={todoInput}
                 onChange={(e) => setTodoInput(e.target.value)}
                 onKeyUp={handleKeyPressTodo}
+                disabled={isEmployee}
                 placeholder="Add a new task item"
                 className="w-full border border-gray-300 px-4 py-2 rounded-l-md outline-none"
               />
               <button
                 type="button"
+                disabled={isEmployee}
                 onClick={handleAddTodoItem}
                 className="bg-violet-100 text-violet-800 font-semibold border border-violet-500 px-4 py-2 rounded-r-md hover:bg-violet-500 hover:text-white transition-colors cursor-pointer flex items-center space-x-2"
               >
@@ -386,6 +397,7 @@ export default function CreateTask() {
                     </span>
                     <button
                       onClick={() => removeTodoItem(index)}
+                      disabled={isEmployee}
                       className="cursor-pointer text-red-500 hover:text-red-900 ml-2"
                     >
                       <Icon icon="mdi:trash-can" width={20} height={20} />
