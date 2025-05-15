@@ -99,6 +99,7 @@ export const deleteTaskById = createAsyncThunk(
       const response = await Axios.delete("/task/delete/" + id);
       toast.success("Task deleted successfully.");
       await dispatch(getTasksThunk());
+      return id;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to delete task";
