@@ -7,6 +7,7 @@ export const createTaskThunk = createAsyncThunk(
   async (task, { rejectWithValue }) => {
     try {
       const response = await Axios.post("/task/create", task);
+      await dispatch(getTasksThunk());
       return response.data;
     } catch (error) {
       const errorMessage =
@@ -134,7 +135,7 @@ const taskSlice = createSlice({
       })
       .addCase(createTaskThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.tasks.push(action.payload);
+
         toast.success("Task added successfully.");
       })
       .addCase(createTaskThunk.rejected, (state, action) => {
