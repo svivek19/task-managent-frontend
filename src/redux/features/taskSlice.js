@@ -4,14 +4,15 @@ import { toast } from "sonner";
 
 export const createTaskThunk = createAsyncThunk(
   "task/createTask",
-  async (task, { rejectWithValue }) => {
+  async (task, { rejectWithValue, dispatch }) => {
     try {
       const response = await Axios.post("/task/create", task);
+      toast.success("Task added successfully.");
       await dispatch(getTasksThunk());
+
       return response.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Task creation failed";
+      const errorMessage = error.response?.data?.message;
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
@@ -135,8 +136,6 @@ const taskSlice = createSlice({
       })
       .addCase(createTaskThunk.fulfilled, (state, action) => {
         state.loading = false;
-
-        toast.success("Task added successfully.");
       })
       .addCase(createTaskThunk.rejected, (state, action) => {
         state.loading = false;
